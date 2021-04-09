@@ -1,15 +1,20 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="container" class="min-h-screen bg-gray-100">
+    <h1>QR Code Chip Generator</h1>
+    <panel></panel>
+    <canvas id="canvas"></canvas>
+  </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import panel from './components/panel.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    panel
+  },
+  mounted: function () {
   }
 }
 </script>
@@ -19,8 +24,7 @@ export default {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
 }
+
 </style>
