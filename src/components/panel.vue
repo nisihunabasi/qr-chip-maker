@@ -1,23 +1,38 @@
 <template>
-    <div id="panel">
-        <form action="" class="form">
-            <label for="upper">上</label><input type="text" name="upper" id="upper" v-model="upperText"><br>
-            <label for="upper">QR</label><input type="text" name="qr" id="qr" v-model="qrText" @change="onChangeQrCode"><br>
-            <label for="upper">下</label><input type="text" name="lower" id="lower" v-model="lowerText"><br>
-            <label for="img-size">画像サイズ：</label>
-            <label for="img-size-small"><input type="radio" name="img-size" id="img-size-small" value="small" @change="onChangeSize">小</label>&nbsp;
-            <label for="img-size-normal"><input type="radio" name="img-size" id="img-size-normal" value="normal" @change="onChangeSize" checked>普通</label>&nbsp;
-            <label for="img-size-large"><input type="radio" name="img-size" id="img-size-large" value="large" @change="onChangeSize">大</label>&nbsp;
+    <div id="panel" class="flex flex-row flex-wrap flex-auto justify-center mx-auto my-6">
+        <form action="" class="form m-2 flex flex-col justify-around">
+            <label class="block">
+                <div class="input-label">上テキスト</div>
+                <input type="text" name="upper" id="upper" v-model="upperText" class="input-form">
+            </label>
+            <label class="block">
+                <div class="input-label">QRコード</div>
+                <input type="text" name="qr" id="qr" v-model="qrText" @change="onChangeQrCode" class="input-form">
+            </label>
+            <label class="block">
+                <div class="input-label">下テキスト</div>
+                <input type="text" name="lower" id="lower" v-model="lowerText" class="input-form">
+            </label>
+            <label class="block">
+                <div class="input-label">画像サイズ</div>
+                <div class="input-form">
+                    <label for="img-size-small"><input type="radio" name="img-size" id="img-size-small" value="small" @change="onChangeSize">小</label>&nbsp;
+                    <label for="img-size-normal"><input type="radio" name="img-size" id="img-size-normal" value="normal" @change="onChangeSize" checked>普通</label>&nbsp;
+                    <label for="img-size-large"><input type="radio" name="img-size" id="img-size-large" value="large" @change="onChangeSize">大</label>&nbsp;
+                </div>
+            </label>
         </form>
-        <div class="result" id="result"></div>
-        <canvas id="qr-code"></canvas>
+        <div id="result" class="result m-2 p-2 box-border border border-solid border-gray-700"></div>
+        <canvas id="shadow" class="hidden"></canvas>
     </div>
 </template>
 
 <style scoped>
-#result {
-    box-sizing: border-box;
-    border: 1px solid #999;
+.input-label {
+    @apply text-center py-2 border border-solid border-gray-200 border-b-0 rounded-t-lg bg-black text-white;
+}
+.input-form {
+    @apply px-2 py-2 border border-solid border-gray-200 border-t-0 rounded-b-lg;
 }
 </style>
 
@@ -36,22 +51,22 @@ let qr = require("qrcode");
 
 export default {
     name: "panel",
-    data() {
+    data () {
         return {
-            upperText: "hogehoge",
-            qrText: "https://appeal.watts1985.jp/",
-            lowerText: "hagehage",
+            upperText: "lorem ipsum",
+            qrText: "https://localhost:8080",
+            lowerText: "localhost:8080",
             qrImg: null,
             imgSize: imgSizeConst.normal
         }
     },
-    mounted: function () {
+    mounted () {
         this.drawResult();
         this.onChangeQrCode();
         //終了処理を実装する。
     },
     methods: {
-        onChangeSize: function(e) {
+        onChangeSize (e) {
             if (e.target.value == "small") {
                 this.imgSize = imgSizeConst.small;
             } else if (e.target.value == "normal") {
@@ -61,7 +76,7 @@ export default {
             }
             this.onChangeQrCode();
         },
-        onChangeQrCode: function() {
+        onChangeQrCode () {
             const options = {
                 width: this.imgSize.qrW
             };
@@ -72,7 +87,7 @@ export default {
                 this.qrImg = img;
             });
         },
-        drawResult: function () {
+        drawResult () {
             const s = (p) => {
                 p.setup = () => {
                     //no-op
@@ -86,28 +101,45 @@ export default {
                     p.rect(0, 0, w, h * ratio.containerHeight);
                     p.rect(0, h - (h * ratio.containerHeight), w, h * ratio.containerHeight);
 
+                    //枠線
+                    p.stroke(0);
+                    p.strokeWeight(2);
+                    p.line(1, 0, 1, h);
+                    p.line(w - 1, 0, w - 1, h);
+
                     p.fill(255);
-                    p.textSize(this.getOptimizedFontSize());
-                    p.textAlign(p.CENTER, p.BOTTOM);
-                    const containerPaddingBottom = Math.round(h * (ratio.containerHeight - ratio.textSize) / 2);
-                    p.text(this.upperText, w / 2, h * ratio.containerHeight - containerPaddingBottom);
-                    p.text(this.lowerText, w / 2, h - containerPaddingBottom);
+                    p.textAlign(p.CENTER, p.CENTER);
+                    p.textSize(this.getOptimizedFontSize(this.upperText, this.imgSize.width, Math.round(this.imgSize.width * ratio.textSize)));
+                    p.text(this.upperText, w / 2, h * ratio.containerHeight / 2);
+                    p.textSize(this.getOptimizedFontSize(this.lowerText, this.imgSize.width, Math.round(this.imgSize.width * ratio.textSize)));
+                    p.text(this.lowerText, w / 2, h - (h * ratio.containerHeight / 2));
                     //TODO 枠線
-                    //TODO 配置時、中央に来るようにする。
                     if (this.qrImg) p.canvas.getContext("2d").drawImage(this.qrImg, w / 2 - this.imgSize.qrW / 2, h / 2 - this.imgSize.qrW / 2);
                 };
             };
             const p5 = require("p5");
             new p5(s, "result");
         },
-        //getOptimizedFontSize(text, fontSize, fontSet, containerWidth) {
-        getOptimizedFontSize() {
-            return Math.round(this.imgSize.width * ratio.textSize);
+        getOptimizedFontSize(text, containerWidth, fontSize, fontSet = "sans-serif") {
+            let nowFontSize = fontSize;
+            let ctx = document.getElementById("shadow").getContext("2d");
+            while (nowFontSize > 0) {
+                //ここでfontの形式が間違っていると、代入が成立せず、かつエラーが起きずに進んでしまう。
+                //"20px sans-serif"と言った形式を守る。
+                ctx.font = nowFontSize + "px " + fontSet;
+                const measure = ctx.measureText(text);
+                if (containerWidth - measure.width > 20) {
+                    break;
+                } else {
+                    nowFontSize--;
+                    continue;
+                }
+            }
+            return nowFontSize;
             //containerWidthに左右余白10px程度余裕をもたせたぐらいのフォントサイズを返す。
             //fontSizeが最初から余裕のある数値だったら、増やさずそのまま返す。
         }
     }
 }
-//QRCodeの書き出し方法 node-qrcode使用。
 //@see https://github.com/soldair/node-qrcode
 </script>

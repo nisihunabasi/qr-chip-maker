@@ -1,8 +1,8 @@
 <template>
-  <div id="container" class="min-h-screen bg-gray-100">
-    <h1>QR Code Chip Generator</h1>
+  <div id="container" class="min-h-screen bg-gray-100 py-8">
+    <h1 class="text-center font-sans text-2xl mb-4">QR Code Chip Generator</h1>
     <panel></panel>
-    <canvas id="canvas"></canvas>
+    <hr>
   </div>
 </template>
 
