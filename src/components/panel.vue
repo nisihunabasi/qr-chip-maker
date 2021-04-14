@@ -15,10 +15,19 @@
             </label>
             <label class="block">
                 <div class="input-label">画像サイズ</div>
-                <div class="input-form">
-                    <label for="img-size-small"><input type="radio" name="img-size" id="img-size-small" value="small" @change="onChangeSize">小</label>&nbsp;
-                    <label for="img-size-normal"><input type="radio" name="img-size" id="img-size-normal" value="normal" @change="onChangeSize" checked>普通</label>&nbsp;
-                    <label for="img-size-large"><input type="radio" name="img-size" id="img-size-large" value="large" @change="onChangeSize">大</label>&nbsp;
+                <div class="input-form-container grid grid-cols-3 gap-0">
+                    <label>
+                        <input type="radio" name="img-size" id="img-size-small" value="small" v-model="imgSizeType" class="hidden">
+                        <div class="input-radio-label rounded-bl-lg">小</div>
+                    </label>
+                    <label>
+                        <input type="radio" name="img-size" id="img-size-normal" value="normal" v-model="imgSizeType" checked class="hidden">
+                        <div class="input-radio-label border-gray-200 border-solid border-l border-r bg-blue-300">普通</div>
+                    </label>
+                    <label>
+                        <input type="radio" name="img-size" id="img-size-large" value="large" v-model="imgSizeType" class="hidden">
+                        <div for="img-size-large" class="input-radio-label rounded-br-lg">大</div>
+                    </label>
                 </div>
             </label>
         </form>
@@ -33,6 +42,16 @@
 }
 .input-form {
     @apply px-2 py-2 border border-solid border-gray-200 border-t-0 rounded-b-lg;
+}
+.input-form-container {
+    @apply p-0 border border-solid border-gray-200 border-t-0 rounded-b-lg;
+}
+.input-radio-label {
+    @apply text-center py-2;
+}
+.result {
+    width: 468px;
+    height: 618px;
 }
 </style>
 
@@ -57,7 +76,7 @@ export default {
             qrText: "https://localhost:8080",
             lowerText: "localhost:8080",
             qrImg: null,
-            imgSize: imgSizeConst.normal
+            imgSizeType: "normal"
         }
     },
     mounted () {
@@ -65,17 +84,19 @@ export default {
         this.onChangeQrCode();
         //終了処理を実装する。
     },
-    methods: {
-        onChangeSize (e) {
-            if (e.target.value == "small") {
-                this.imgSize = imgSizeConst.small;
-            } else if (e.target.value == "normal") {
-                this.imgSize = imgSizeConst.normal;
-            } else if (e.target.value == "large") {
-                this.imgSize = imgSizeConst.large;
-            }
+    watch: {
+        imgSizeType (val) {
+            document.querySelectorAll("input[name='img-size'] + div").forEach(elm => elm.className = elm.className.replace(/\s?bg-blue-300/, ""));
+            document.querySelector("input[name='img-size'][value='" + val + "'] + div").className += " bg-blue-300";
             this.onChangeQrCode();
-        },
+        }
+    },
+    computed: {
+        imgSize () {
+            return imgSizeConst[this.imgSizeType];
+        }
+    },
+    methods: {
         onChangeQrCode () {
             const options = {
                 width: this.imgSize.qrW
