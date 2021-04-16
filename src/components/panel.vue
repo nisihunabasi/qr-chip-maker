@@ -51,7 +51,7 @@
 }
 .result {
     width: 468px;
-    height: 618px;
+    height: 606px;
 }
 </style>
 
@@ -62,9 +62,9 @@ const ratio = {
     containerHeight: 0.13
 };
 const imgSizeConst = {
-    small: {width: 200, height: 300, qrW: 180},
-    normal: {width: 354, height: 460, qrW: 320},
-    large: {width: 450, height: 600, qrW: 410}
+    small: {width: 200, height: 260, qrW: 190},
+    normal: {width: 354, height: 460, qrW: 334},
+    large: {width: 450, height: 586, qrW: 430}
 };
 let qr = require("qrcode");
 
@@ -99,7 +99,8 @@ export default {
     methods: {
         onChangeQrCode () {
             const options = {
-                width: this.imgSize.qrW
+                width: this.imgSize.qrW,
+                margin: 2
             };
             qr.toDataURL(this.qrText, options, (err, url) => {
                 if (err) console.error(err);
