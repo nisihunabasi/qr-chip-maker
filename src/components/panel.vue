@@ -129,18 +129,27 @@ export default {
                     p.line(1, 0, 1, h);
                     p.line(w - 1, 0, w - 1, h);
 
+                    //テキスト
                     p.fill(255);
                     p.textAlign(p.CENTER, p.CENTER);
                     p.textSize(this.getOptimizedFontSize(this.upperText, this.imgSize.width, Math.round(this.imgSize.width * ratio.textSize)));
                     p.text(this.upperText, w / 2, h * ratio.containerHeight / 2);
                     p.textSize(this.getOptimizedFontSize(this.lowerText, this.imgSize.width, Math.round(this.imgSize.width * ratio.textSize)));
                     p.text(this.lowerText, w / 2, h - (h * ratio.containerHeight / 2));
-                    //TODO 枠線
+
+                    //QRコード
                     if (this.qrImg) p.canvas.getContext("2d").drawImage(this.qrImg, w / 2 - this.imgSize.qrW / 2, h / 2 - this.imgSize.qrW / 2);
                 };
             };
+            //webpack4環境下で非同期にCommonJSモジュールを読み込んだ場合、defaultと明示しないといけない。
+            //@see https://webpack.js.org/guides/code-splitting/#dynamic-imports
+            //@see https://medium.com/webpack/webpack-4-import-and-commonjs-d619d626b655
+            import("p5").then(module => new module.default(s, "result"));
+
+            /*
             const p5 = require("p5");
             new p5(s, "result");
+            */
         },
         getOptimizedFontSize(text, containerWidth, fontSize, fontSet = "sans-serif") {
             let nowFontSize = fontSize;
