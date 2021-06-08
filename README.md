@@ -1,5 +1,8 @@
 # qr-chip-maker
 
+以下のURLから利用できます。  
+https://qr-chip-maker.web.app/
+
 印刷に適した（と自分では思っている）QRコードの画像を作ってくれます。
 
 以下の3サイズを出力できます。
